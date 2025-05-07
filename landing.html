@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .text {
+            position: relative;
+            font-size: 8vw;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1;
+            z-index: 1;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .text span {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+            animation-delay: calc(0.1s * var(--i));
+            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
+        }
+
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,255,255,0.2) 0%, transparent 70%);
+            filter: blur(20px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #0ff;
+            border-radius: 50%;
+            animation: particleFloat 3s ease-in-out infinite;
+            animation-delay: calc(0.1s * var(--i));
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(var(--x), var(--y));
+                opacity: 1;
+            }
+        }
+
+        .subtitle {
+            position: absolute;
+            bottom: 20%;
+            font-size: 1.8vw;
+            color: #0ff;
+            text-align: center;
+            width: 100%;
+            opacity: 0.9;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+            animation: subtitleGlow 2s ease-in-out infinite;
+        }
+
+        .click-instruction {
+            position: absolute;
+            bottom: 10%;
+            font-size: 1.4vw;
+            color: #fff;
+            text-align: center;
+            width: 100%;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: fadeInOut 2s ease-in-out infinite;
+            background: linear-gradient(90deg, #fff, #0ff, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: textShine 3s linear infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes subtitleGlow {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(0,255,255,0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 30px rgba(0,255,255,0.6);
+            }
+        }
+
+        @keyframes textShine {
+            0% {
+                background-position: 0% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" onclick="window.location.href='index.html'">
+        <div class="glow"></div>
+        <div class="text">
+            <span style="--i:1">G</span>
+            <span style="--i:2">A</span>
+            <span style="--i:3">M</span>
+            <span style="--i:4">E</span>
+            <span style="--i:5"> </span>
+            <span style="--i:6">H</span>
+            <span style="--i:7">U</span>
+            <span style="--i:8">B</span>
+        </div>
+        <div class="subtitle">Classic Games Collection</div>
+        <div class="click-instruction">Click anywhere to enter</div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <script>
+        // Create particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.setProperty('--i', i);
+            particle.style.setProperty('--x', `${Math.random() * 200 - 100}px`);
+            particle.style.setProperty('--y', `${Math.random() * 200 - 100}px`);
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html> 

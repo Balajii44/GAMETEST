@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Game - Final Challenge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: #2a2a2a;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
+            border: 1px solid #0ff;
+            margin-top: 20px;
+        }
+
+        .title {
+            color: #0ff;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+
+        #mazeCanvas {
+            border: 3px solid #0ff;
+            background: #1a1a1a;
+        }
+
+        .controls {
+            margin-top: 1rem;
+            text-align: center;
+            color: #0ff;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #0ff;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #00cccc;
+            box-shadow: 0 0 15px rgba(0,255,255,0.5);
+        }
+
+        .win-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px rgba(0,255,255,0.3);
+        }
+
+        .win-message h2 {
+            color: #0ff;
+            margin-bottom: 1rem;
+        }
+
+        .win-message p {
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+
+        .win-message button {
+            background: #0ff;
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .win-message button:hover {
+            background: #00cccc;
+            box-shadow: 0 0 15px rgba(0,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">Back to Games</button>
+    <h1 class="title">Final Challenge: The Maze</h1>
+    <div class="game-container">
+        <canvas id="mazeCanvas" width="400" height="400"></canvas>
+        <div class="controls">
+            Use arrow keys to navigate. Reach the cyan square to win!
+        </div>
+    </div>
+
+    <div class="win-message" id="winMessage">
+        <h2>Congratulations!</h2>
+        <p>You've completed all challenges!</p>
+        <button onclick="window.location.href='landing.html'">Play Again</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mazeCanvas');
+        const ctx = canvas.getContext('2d');
+        const cellSize = 20;
+        const rows = canvas.height / cellSize;
+        const cols = canvas.width / cellSize;
+
+        let player = { x: 1, y: 1 };
+        let end = { x: cols - 2, y: rows - 2 };
+        let maze = [];
+
+        // Generate maze using recursive backtracking
+        function generateMaze() {
+            // Initialize maze with walls
+            for (let y = 0; y < rows; y++) {
+                maze[y] = [];
+                for (let x = 0; x < cols; x++) {
+                    maze[y][x] = 1; // 1 = wall
+                }
+            }
+
+            function carve(x, y) {
+                maze[y][x] = 0; // 0 = path
+
+                const directions = [
+                    [0, -2], // up
+                    [2, 0],  // right
+                    [0, 2],  // down
+                    [-2, 0]  // left
+                ];
+
+                // Shuffle directions
+                for (let i = directions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [directions[i], directions[j]] = [directions[j], directions[i]];
+                }
+
+                for (const [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx > 0 && nx < cols - 1 && ny > 0 && ny < rows - 1 && maze[ny][nx] === 1) {
+                        maze[y + dy/2][x + dx/2] = 0;
+                        carve(nx, ny);
+                    }
+                }
+            }
+
+            carve(1, 1);
+            maze[end.y][end.x] = 0;
+        }
+
+        function drawMaze() {
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw walls
+            ctx.fillStyle = '#2a2a2a';
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    if (maze[y][x] === 1) {
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+
+            // Draw end point
+            ctx.fillStyle = '#0ff';
+            ctx.shadowColor = '#0ff';
+            ctx.shadowBlur = 10;
+            ctx.fillRect(end.x * cellSize, end.y * cellSize, cellSize, cellSize);
+            ctx.shadowBlur = 0;
+
+            // Draw player
+            ctx.fillStyle = '#ff00ff';
+            ctx.shadowColor = '#ff00ff';
+            ctx.shadowBlur = 10;
+            ctx.fillRect(player.x * cellSize, player.y * cellSize, cellSize, cellSize);
+            ctx.shadowBlur = 0;
+        }
+
+        function movePlayer(dx, dy) {
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+
+            if (newX >= 0 && newX < cols && newY >= 0 && newY < rows && maze[newY][newX] === 0) {
+                player.x = newX;
+                player.y = newY;
+
+                // Check for win
+                if (player.x === end.x && player.y === end.y) {
+                    document.getElementById('winMessage').style.display = 'block';
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch(e.keyCode) {
+                case 37: // left
+                    movePlayer(-1, 0);
+                    break;
+                case 38: // up
+                    movePlayer(0, -1);
+                    break;
+                case 39: // right
+                    movePlayer(1, 0);
+                    break;
+                case 40: // down
+                    movePlayer(0, 1);
+                    break;
+            }
+            drawMaze();
+        });
+
+        // Initialize and start the game
+        generateMaze();
+        drawMaze();
+    </script>
+</body>
+</html> 
